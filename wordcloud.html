@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>모바일 워드클라우드 테스트</title>
+  <script src="https://cdn.jsdelivr.net/npm/wordcloud2.js"></script>
+  <style>
+    body { 
+      margin: 0; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      height: 100vh; 
+      background: #f8f8f8; 
+    }
+    #canvas { 
+      width: 90vw;   /* 화면의 90% 너비 */
+      height: 90vh;  /* 화면의 90% 높이 */
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+
+  <script>
+    const words = [
+      ["기숙사", 50],
+      ["강의평", 30],
+      ["중간고사", 25],
+      ["등록금", 20],
+      ["편의점", 15],
+      ["교수님", 10],
+      ["동아리", 40],
+      ["취업", 35],
+      ["장학금", 28],
+      ["도서관", 18],
+      ["기말고사", 22],
+      ["학생회", 17]
+    ];
+
+    const canvas = document.getElementById('canvas');
+
+    // 반응형 크기 조정
+    function resizeCanvas() {
+      canvas.width = window.innerWidth * 0.9;
+      canvas.height = window.innerHeight * 0.9;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    WordCloud(canvas, {
+      list: words,
+      gridSize: 8,
+      weightFactor: size => Math.min(canvas.width, canvas.height) / 60 * (size / 20), // 모바일 화면 비율 맞춤
+      fontFamily: 'Nanum Gothic, sans-serif',
+      color: () => '#' + Math.floor(Math.random()*16777215).toString(16), // 랜덤 색상
+      rotateRatio: 0.5,
+      rotationSteps: 2,
+      backgroundColor: '#ffffff',
+      clearCanvas: true,
+      drawOutOfBound: false
+    });
+  </script>
+</body>
+</html>
