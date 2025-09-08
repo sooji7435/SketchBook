@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>중부대학교 워드클라우드</title>
+  <script src="https://cdn.jsdelivr.net/npm/wordcloud2.js"></script>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f8f8f8;
+      font-family: "Nanum Gothic", sans-serif;
+    }
+    #canvas {
+      width: 600px;
+      height: 600px;
+      border: 1px solid #ccc;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+
+  <script>
+    // 워드 클라우드 단어 리스트 (단어, 가중치)
+    const words = [
+      ["기숙사", 50],
+      ["강의평", 30],
+      ["중간고사", 25],
+      ["등록금", 20],
+      ["편의점", 15],
+      ["교수님", 10],
+      ["동아리", 40],
+      ["취업", 35],
+      ["장학금", 28],
+      ["도서관", 18],
+      ["기말고사", 22],
+      ["학생회", 17]
+    ];
+
+    const canvas = document.getElementById("canvas");
+
+    WordCloud(canvas, {
+      list: words,
+      gridSize: 8,
+      weightFactor: 3,
+      fontFamily: "Nanum Gothic, sans-serif",
+      color: () =>
+        "#" + Math.floor(Math.random() * 16777215).toString(16), // 랜덤 색상
+      rotateRatio: 0.5, // 일부 단어 회전
+      rotationSteps: 2, // 회전 각도 단계
+      backgroundColor: "#ffffff",
+      clearCanvas: true,
+      drawOutOfBound: false,
+    });
+  </script>
+</body>
+</html>
