@@ -2,62 +2,104 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>단어 쌓이기 테스트</title>
+  <title>단어 블록 쌓기</title>
   <style>
     body {
       margin: 0;
-      height: 100vh;
       overflow: hidden;
       background: #111;
       color: white;
       font-family: sans-serif;
-      position: relative;
     }
-    .word {
-      position: absolute;
-      top: -50px;
-      white-space: nowrap;
-      font-weight: bold;
-      animation: fall linear;
-    }
-    @keyframes fall {
-      to {
-        top: calc(100vh - 30px); /* 바닥까지 */
-      }
-    }
-    #ground {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      height: 40px;
-      background: rgba(255,255,255,0.1);
+    canvas {
+      display: block;
     }
   </style>
 </head>
 <body>
-  <div id="ground"></div>
+  <!-- Matter.js 불러오기 -->
+  <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
   <script>
+    const { Engine, Render, Runner, World, Bodies, Body } = Matter;
+
+    // 엔진/월드 생성
+    const engine = Engine.create();
+    const world = engine.world;
+
+    // 렌더링
+    const render = Render.create({
+      element: document.body,
+      engine: engine,
+      options: {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        wireframes: false,
+        background: "#111"
+      }
+    });
+    Render.run(render);
+    Runner.run(Runner.create(), engine);
+
+    // 바닥 추가
+    const ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight, window.innerWidth, 40, {
+      isStatic: true,
+      render: { fillStyle: "#333" }
+    });
+    World.add(world, ground);
+
+    // 단어 리스트
     const words = ["강의평", "기숙사", "중간고사", "장학금", "알바", "교수님"];
 
-    function createWord() {
-      const word = document.createElement("div");
-      word.className = "word";
-      word.textContent = words[Math.floor(Math.random() * words.length)];
-      word.style.left = Math.random() * (window.innerWidth - 100) + "px"; 
-      word.style.fontSize = (16 + Math.random() * 24) + "px";     
-      const duration = 3 + Math.random() * 5;
-      word.style.animationDuration = duration + "s"; 
+    // 단어 떨어뜨리기
+    function dropWord() {
+      const text = words[Math.floor(Math.random() * words.length)];
+      const fontSize = 16 + Math.floor(Math.random() * 24);
 
-      document.body.appendChild(word);
+      // 단어를 Canvas 대신 Matter.js 사각형으로
+      const width = text.length * (fontSize * 0.6);
+      const height = fontSize * 1.2;
+      const x = Math.random() * (window.innerWidth - width);
+      const y = -50;
 
-      // 애니메이션 끝나면 "바닥에 고정"
-      setTimeout(() => {
-        word.style.animation = "none";
-        word.style.top = "calc(100vh - 50px)";
-      }, duration * 1000);
+      const wordBlock = Bodies.rectangle(x, y, width, height, {
+        restitution: 0.2,
+        friction: 0.5,
+        render: {
+          fillStyle: "#"+Math.floor(Math.random()*16777215).toString(16),
+          strokeStyle: "white",
+          lineWidth: 1,
+        },
+        label: text
+      });
+
+      World.add(world, wordBlock);
     }
 
-    setInterval(createWord, 800);
+    // 일정 주기로 단어 생성
+    setInterval(dropWord, 1000);
+
+    // 단어를 그려주는 플러그인
+    (function renderWords() {
+      const ctx = render.context;
+      requestAnimationFrame(renderWords);
+
+      ctx.save();
+      ctx.font = "bold 20px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "white";
+
+      world.bodies.forEach(body => {
+        if (body.label && words.includes(body.label)) {
+          ctx.save();
+          ctx.translate(body.position.x, body.position.y);
+          ctx.rotate(body.angle);
+          ctx.fillText(body.label, 0, 0);
+          ctx.restore();
+        }
+      });
+      ctx.restore();
+    })();
   </script>
 </body>
 </html>
