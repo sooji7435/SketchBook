@@ -2,61 +2,62 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>중부대학교 워드클라우드</title>
-  <script src="https://unpkg.com/wordcloud2.js"></script>
+  <title>단어 쌓이기 테스트</title>
   <style>
     body {
       margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       height: 100vh;
-      background: #f8f8f8;
-      font-family: "Nanum Gothic", sans-serif;
+      overflow: hidden;
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+      position: relative;
     }
-    #canvas {
-      width: 600px;
-      height: 600px;
-      border: 1px solid #ccc;
-      background: #fff;
+    .word {
+      position: absolute;
+      top: -50px;
+      white-space: nowrap;
+      font-weight: bold;
+      animation: fall linear;
+    }
+    @keyframes fall {
+      to {
+        top: calc(100vh - 30px); /* 바닥까지 */
+      }
+    }
+    #ground {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 40px;
+      background: rgba(255,255,255,0.1);
     }
   </style>
 </head>
 <body>
-  <canvas id="canvas"></canvas>
-
+  <div id="ground"></div>
   <script>
-    // 워드 클라우드 단어 리스트 (단어, 가중치)
-    const words = [
-      ["기숙사", 50],
-      ["강의평", 30],
-      ["중간고사", 25],
-      ["등록금", 20],
-      ["편의점", 15],
-      ["교수님", 10],
-      ["동아리", 40],
-      ["취업", 35],
-      ["장학금", 28],
-      ["도서관", 18],
-      ["기말고사", 22],
-      ["학생회", 17]
-    ];
+    const words = ["강의평", "기숙사", "중간고사", "장학금", "알바", "교수님"];
 
-    const canvas = document.getElementById("canvas");
+    function createWord() {
+      const word = document.createElement("div");
+      word.className = "word";
+      word.textContent = words[Math.floor(Math.random() * words.length)];
+      word.style.left = Math.random() * (window.innerWidth - 100) + "px"; 
+      word.style.fontSize = (16 + Math.random() * 24) + "px";     
+      const duration = 3 + Math.random() * 5;
+      word.style.animationDuration = duration + "s"; 
 
-    WordCloud(canvas, {
-      list: words,
-      gridSize: 8,
-      weightFactor: 3,
-      fontFamily: "Nanum Gothic, sans-serif",
-      color: () =>
-        "#" + Math.floor(Math.random() * 16777215).toString(16), // 랜덤 색상
-      rotateRatio: 0.5, // 일부 단어 회전
-      rotationSteps: 2, // 회전 각도 단계
-      backgroundColor: "#ffffff",
-      clearCanvas: true,
-      drawOutOfBound: false,
-    });
+      document.body.appendChild(word);
+
+      // 애니메이션 끝나면 "바닥에 고정"
+      setTimeout(() => {
+        word.style.animation = "none";
+        word.style.top = "calc(100vh - 50px)";
+      }, duration * 1000);
+    }
+
+    setInterval(createWord, 800);
   </script>
 </body>
 </html>
